@@ -1,6 +1,8 @@
 var React = require('react');
 import io from 'socket.io-client';
 
+import Chat from './Chat.js';
+
 class Home extends React.Component {
     constructor(props) {
        super(props);
@@ -8,56 +10,64 @@ class Home extends React.Component {
          socket: io(),
          login: true, // Lets assume you've logged in
          user: {name:"nicklas"},
-         rooms: []
+         room: "room1",
+         inRoom: false
      };
       this.joinRoom = this.joinRoom.bind(this);
       this.createRoom = this.createRoom.bind(this);
       this.leaveRoom = this.leaveRoom.bind(this);
-      this.pingRoom = this.pingRoom.bind(this);
-
-      this.joinRoom2 = this.joinRoom2.bind(this);
-      this.createRoom2 = this.createRoom2.bind(this);
+      this.handleChange = this.handleChange.bind(this);
  }
 
  componentDidMount() {
-    this.state.socket.on('get rooms', (rooms) => {
+   const {socket, user} = this.state;
+
+    socket.on('get rooms', (rooms) => {
         this.setState({rooms: rooms});
     });
-    this.state.socket.emit('setup user', this.state.user);
+
+    socket.emit('setup user', user);
+    console.log(user);
 }
 
-componentWillUnmount() {
-    this.state.socket.close();
-}
+  componentWillUnmount() {
+      this.state.socket.close();
+  }
 
-createRoom() {
-  this.state.socket.emit('create room', 'room1', 'chat');
-}
-createRoom2() {
-  this.state.socket.emit('create room', 'room2', 'chat');
-}
-joinRoom() {
-  this.state.socket.emit('join room', 'room1');
-}
-joinRoom2() {
-  this.state.socket.emit('join room', 'room2');
-}
-leaveRoom() {
-  this.state.socket.emit('leave room', 'room1');
-}
-pingRoom() {
-  this.state.socket.emit('ping room1');
-}
+  handleChange(event) {
+      this.setState({room: event.target.value});
+      console.log(this.state.room);
+  }
+
+  createRoom() {
+    this.state.socket.emit('create room', this.state.room, 'chat');
+  }
+
+  joinRoom() {
+    this.state.socket.emit('join room', this.state.room);
+    this.setState({inRoom: true});
+  }
+  leaveRoom() {
+    this.state.socket.emit('leave room', this.state.room);
+    this.setState({inRoom: false});
+  }
+
   render() {
     return (
         <div>
             <h1>Socket-Mansion</h1>
-             <button onClick={this.createRoom}>Create room</button>
-             <button onClick={this.joinRoom}>Join Room</button>
-             <button onClick={this.pingRoom}>Ping Room</button>
+            <p> Select something to create or join </p>
+             <select value={this.state.room} onChange={this.handleChange}>
+              <option value="room1">room1</option>
+              <option value="room2">room2</option>
+              <option value="room3">room3</option>
+            </select>
 
-             <button onClick={this.createRoom2}>Create room2</button>
-             <button onClick={this.joinRoom2}>Join Room2</button>
+             <button onClick={this.createRoom}>Create</button>
+             <button onClick={this.joinRoom}>Join</button>
+             <button onClick={this.leaveRoom}>Leave</button>
+
+            {this.state.inRoom && <Chat socket={this.state.socket} id={this.state.room} />}
         </div>
     );
   }

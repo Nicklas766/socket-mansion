@@ -3,49 +3,64 @@ const io   = require('socket.io');
 
 
 
-const getUser = (id) => this.users.filter(user => id == user.id)[0];
+const getUser = (arr, id) => arr.filter(user => id == user.id)[0];
+
+/**
+* Chat
+* @param io object
+* @param id string
+*/
+function chat(io, id) {
+    this.io       = io;
+    this.id       = id;
+    this.messages = [{text: `Room ${id} has been created`, name: "server"}];
+    this.users    = [];
+};
 
 /**
 * Connect user to the chat, save socket so we can use it
 * @param user object
 * @param socket object
 */
-const connect = (user, socket) => {
-    this.users.push({user: user, socket: socket, typing: false});
 
-    this.messages.push({text: `${user} has joined the server`, name: "server"});
-}
+const createMessage = ({ text='', name='server', date=Date.now() }) => ({
+      text,
+      name,
+      date
+});
 
+chat.prototype.message = function (socket) {
+    const user = getUser(this.users, socket.id);
 
-const message = (socket) => {
-    socket.to(this.id).emit('message', 'what is going on, party people?');
-}
+    socket.on(`message ${this.id}`, (text) => {
+      const msg     = createMessage({text: text, name: user.name});
+      this.messages = this.messages.concat(msg); // Save
 
-const ping = (socket) => {
-    socket.on('ping ' + this.id, () => {
-      console.log("Room  has been pinged", this.id);
+      this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
     });
 }
 
-/**
-* Main container for the socketChat
-* @param room socket object
-* @param users array of user object
-*/
-const chat = (id) => {
-    this.id = id;
-    this.messages = [];
+// Greet new user connected
+chat.prototype.greet = function (name) {
+  msg = createMessage({text: `${name} has joined the server, welcome!`});
+  this.messages = this.messages.concat(msg); // Save
 
-    return {
-        setup(socket) {
-            ping(socket);
-        },
-        off(socket) {
-            socket.off('ping' + this.id);
-        }
-    };
+  this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
+}
 
+chat.prototype.setup = function (userObj) {
+  const socket = userObj.socket;
+  // add new user
+  const user = {name: userObj.user.name, id: socket.id};
+  this.users = this.users.concat(user);
 
-};
+  // setup events
+  this.message(socket);
+  this.greet(user.name);
+}
+chat.prototype.off = function (socket) {
+  socket.off(`message ${this.id}`); // Remove events for socket
+  this.users = this.users.filter(user => user.id != socket.id) // Remove user
+}
 
 module.exports = { chat };

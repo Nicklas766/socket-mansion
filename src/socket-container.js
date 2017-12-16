@@ -11,21 +11,22 @@ const chatModule = require('./chat.js');
 *
 */
 
-
-const getUser   = (id) => this.users.filter(user => id == user.id)[0];
-const getRoom   = (id)  => this.rooms.filter(room => id == room.id)[0];
-const getModule = (name) => this.modules.filter(module => name == module.name)[0].module;
+const getModule  = (name) => this.modules.filter(module => name == module.name)[0].module;
+const getRoom    = (id)  => this.rooms.filter(room => id == room.id)[0];
+const getUser    = (id) => this.users.filter(user => id == user.id)[0];
+const removeUser = (arr, id) => arr.filter(user => user.id != id);
 
 /**
 * Setup user and adds it to the this.users array
 */
 const setupUser = (socket) => {
     socket.on('setup user', (user) => {
+        console.log(user)
         this.users.push({
             id: socket.id,
+            socket: socket,
             user: user
         });
-        this.io.emit('get users', this.users);
     });
 };
 
@@ -44,47 +45,49 @@ const setupRoom = (socket) => {
     */
     socket.on('create room', (id, moduleName) => {
       const module = getModule(moduleName);
-
-
+      console.log(`room ${id} created`);
       this.rooms.push({
-            module: module(id),
+            module: new module(this.io, id),
             id: id,
             users: []
           });
-          console.log(this.rooms)
     });
     // Joins the room
     socket.on('join room', (id) => {
-        const user = getUser(socket.id);
+        const user = this.users.filter(user => socket.id == user.id)[0];
+        console.log(user);
         let room = getRoom(id);
-        room.users.push(user);
+        // Add new user into this.rooms[].users
+        this.rooms = this.rooms.map(room => id == room.id ? Object.assign(room, {users: room.users.concat(user)}) : room);
 
         // setup room events for socket
-        room.module.setup(socket);
-        console.log("Someone joined room: ", id);
-
-        this.rooms = this.rooms.map(room => id == room.id ? Object.assign(room, {users: room.users}) : room);
         socket.join(id);
-
+        room.module.setup(user);
+        console.log('Someone joined room: ', id);
     });
 
-    // Leaves the room
+    // Leaves room
     socket.on('leave room', (id) => {
-        const user = getUser(socket.id);
-        const room = getRoom(id);
+        let roomObj = getRoom(id);
 
+        // Remove user from this.rooms[].users
+        roomObj.users = room.users.filter(user => user.id != socket.id);
+        this.rooms    = this.rooms.map(room => id == room.id ? roomObj : room);
+
+        // Remove events for socket and leave room
         room.module.off(socket);
-
-        // Remove user
-        const newRoom = room.users.filter(user => user.id != socket.id);
-
-        // Update room in array
-        this.rooms = this.rooms.map(room => id == room.id ? newRoom : room);
         socket.leave(id);
     });
 };
 
-
+const setupGet = (socket) => {
+  socket.on('get users', () => {
+      this.io.emit('get users', this.users);
+  });
+  socket.on('get rooms', () => {
+      this.io.emit('get rooms', this.rooms);
+  });
+}
 /**
 * Disconnects the socket and removes the user from this.users based on socket.id
 */
@@ -92,7 +95,14 @@ const disconnect = (socket) => {
     socket.on('disconnect', () => {
         console.log(socket.id + ' disconnected');
 
-        this.users = this.users.filter(user => socket.id != user.id);
+        // Remove user from all rooms and events for socket
+        for (let room of this.rooms) {
+          room.users = removeUser(room.users, socket.id);
+          room.module.off(socket);
+        }
+        this.users = removeUser(this.users, socket.id);
+
+
         this.io.emit('get users', this.users);
     });
 };
@@ -104,8 +114,8 @@ const socketContainer = (server, modules) => {
     this.io = new io(server);
 
     this.modules = modules;  // Contains all injected modules
-    this.users   = [];  // Contains all the users
-    this.rooms   = [];  // Contains all rooms, such as chat, game, etc.
+    this.users   = [];       // Contains all the users connected
+    this.rooms   = [];       // Contains all rooms, such as chat, game, etc.
 
     console.log(modules);
 
@@ -118,6 +128,7 @@ const socketContainer = (server, modules) => {
 
         setupUser(socket);
         setupRoom(socket);
+        setupGet(socket);
 
         disconnect(socket);
 
