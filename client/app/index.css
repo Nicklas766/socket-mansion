@@ -1,0 +1,25 @@
+@import url('https://fonts.googleapis.com/css?family=Baloo+Bhaijaan|Raleway');
+
+html,
+body {
+    font-family: 'Baloo Bhaijaan', cursive;
+    color: black;
+    margin: 0;
+    padding: 0;
+    background: #f4f4f4;
+    letter-spacing: 1px;
+}
+
+p {
+    font-family: 'Raleway', sans-serif;
+}
+
+.container {
+    width: 960px;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    background: white;
+    box-shadow: 1px 1px 3px 1px black;
+}

@@ -1,0 +1,48 @@
+{
+  "name": "socket-mansion",
+  "version": "1.0.0",
+  "description": "Helps you keep track of your users with multiple rooms",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "concurrently \"npm run mocha\" \"npm run stylelint\" \"npm run eslint\"",
+    "mocha": "nyc --reporter=html --reporter=text mocha --reporter spec test/react/testSetup.js \"test/**/*.spec.js\"",
+    "stylelint": "node_modules/.bin/stylelint **/*.css",
+    "eslint": "node_modules/.bin/eslint --ignore-path .eslintignore .",
+    "coverage-scrut": "nyc --reporter=clover mocha --reporter spec test/react/testSetup.js \"test/**/*.spec.js\"",
+    "docker1": "docker-compose run node-latest",
+    "docker-build-start": "docker-compose up -d --no-deps --build"
+  },
+  "author": "Nicklas Envall",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "~1.18.2",
+    "concurrently": "^3.5.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "morgan": "~1.9.0",
+    "serve-favicon": "~2.4.5",
+    "socket.io": "^2.0.4"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.0.3",
+    "babel-preset-env": "^1.5.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-register": "^6.26.0",
+    "clean-css-cli": "^4.1.10",
+    "coveralls": "^3.0.0",
+    "eslint": "^4.12.1",
+    "eslint-plugin-react": "^7.4.0",
+    "js-yaml": "^3.10.0",
+    "jsdom": "9.11.0",
+    "mocha": "^4.0.1",
+    "nyc": "^11.2.1",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "stylelint": "^8.3.1",
+    "supertest": "^3.0.0",
+    "uglify-js": "^3.1.6"
+  }
+}

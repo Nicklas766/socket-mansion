@@ -1,0 +1,40 @@
+{
+    "name": "react-client-for-express",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "create": "webpack",
+        "start": "webpack-dev-server --open",
+        "build": "SET NODE_ENV='production' & webpack -p"
+    },
+    "babel": {
+        "presets": [
+            "env",
+            "react"
+        ]
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "axios": "^0.16.2",
+        "prop-types": "^15.5.10",
+        "react": "^16.0.0",
+        "react-dom": "^16.0.0",
+        "react-markdown": "^2.5.0",
+        "react-router-dom": "^4.2.2",
+        "socket.io-client": "^2.0.4"
+    },
+    "devDependencies": {
+        "babel-core": "^6.25.0",
+        "babel-loader": "^7.1.0",
+        "babel-preset-env": "^1.5.2",
+        "babel-preset-react": "^6.24.1",
+        "css-loader": "^0.28.4",
+        "html-webpack-plugin": "^2.28.0",
+        "style-loader": "^0.18.2",
+        "webpack": "^3.0.0",
+        "webpack-dev-server": "^2.5.0"
+    }
+}
