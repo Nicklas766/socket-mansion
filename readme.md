@@ -16,6 +16,8 @@ unsubscribe all events when you leave the room.
 ## Good to know before we get started
 
 ### Server
+
+**Room**
 ```javascript
 // Your room modules need to have, io and id as parameters.
 function room(io, id) {
@@ -24,12 +26,14 @@ function room(io, id) {
 };
 ```
 
+**Setup user in mansion**
 ```javascript
 // You need to setup user before emitting anything else
 socket.emit(`setup user`, userObj)            // Client emits
 {id: socket.id, socket: socket, user: userObj} // Server saves
 ```
 
+**When user joins room**
 ```javascript
 // Your module needs to have a "setup(userObj)", which is called on join
 room.prototype.setup = function (userObj) {
@@ -38,9 +42,10 @@ room.prototype.setup = function (userObj) {
 }
 ```
 
+**When user leaves room**
 ```javascript
 // Your module needs to have an "off(socket)", which is called on leave
-chat.prototype.off = function (socket) {
+room.prototype.off = function (socket) {
     socket.off(`my event`); // Remove events for socket
 }
 ```
@@ -105,5 +110,7 @@ leaveRoom() {
 Instead of me posting lots of code, then please checkout
 
 [Chat (server)](https://github.com/Nicklas766/socket-mansion/blob/master/src/chat.js)
+
 [Choose room (client)](https://github.com/Nicklas766/socket-mansion/blob/master/client/app/compontents/page/Home.js)
+
 [Chat room (client)](https://github.com/Nicklas766/socket-mansion/blob/master/client/app/compontents/page/Chat.js)

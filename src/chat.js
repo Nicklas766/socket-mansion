@@ -1,8 +1,3 @@
-const io   = require('socket.io');
-
-
-
-
 const getUser = (arr, id) => arr.filter(user => id == user.id)[0];
 
 /**
@@ -15,32 +10,34 @@ function chat(io, id) {
     this.id       = id;
     this.messages = [{text: `Room ${id} has been created`, name: "server"}];
     this.users    = [];
-};
+}
 
 const createMessage = ({ text='', name='server', date=Date.now() }) => ({
-      text,
-      name,
-      date
+    text,
+    name,
+    date
 });
 
 chat.prototype.message = function (socket) {
     const user = getUser(this.users, socket.id);
 
     socket.on(`message ${this.id}`, (text) => {
-      const msg     = createMessage({text: text, name: user.name});
-      this.messages = this.messages.concat(msg); // Save
+        const msg     = createMessage({text: text, name: user.name});
 
-      this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
+        this.messages = this.messages.concat(msg); // Save
+
+        this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
     });
-}
+};
 
 // Greet new user connected
 chat.prototype.greet = function (name) {
-  msg = createMessage({text: `${name} has joined the server, welcome!`});
-  this.messages = this.messages.concat(msg); // Save
+    const msg = createMessage({text: `${name} has joined the server, welcome!`});
 
-  this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
-}
+    this.messages = this.messages.concat(msg); // Save
+
+    this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
+};
 
 /**
 * Connect user to the chat, save socket so we can use it
@@ -49,19 +46,19 @@ chat.prototype.greet = function (name) {
 */
 
 
-chat.prototype.setup = function (userObj) {
-  const socket = userObj.socket;
-  // add new user
-  const user = {name: userObj.user.name, id: socket.id};
-  this.users = this.users.concat(user);
+chat.prototype.setup = function (socket, userObj) {
+    // add new user
+    const user = {name: userObj.user.name, id: socket.id};
 
-  // setup events
-  this.message(socket);
-  this.greet(user.name);
-}
+    this.users = this.users.concat(user);
+
+    // setup events
+    this.message(socket);
+    this.greet(user.name);
+};
 chat.prototype.off = function (socket) {
-  socket.off(`message ${this.id}`); // Remove events for socket
-  this.users = this.users.filter(user => user.id != socket.id) // Remove user
-}
+    socket.removeAllListeners(`message ${this.id}`); // Remove events for socket
+    this.users = this.users.filter(user => user.id != socket.id); // Remove user
+};
 
 module.exports = { chat };

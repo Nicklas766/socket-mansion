@@ -1,0 +1,20 @@
+version: '3'
+services:
+    express:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        volumes:
+            - ./:/app/
+            - /app/node_modules/
+        ports:
+            - 1337:1337
+        command: "npm start"
+    test:
+        build:
+            context: .
+            dockerfile: docker/Dockerfile-node-latest
+        links:
+            - express
+        volumes:
+            - ./:/home/node/app

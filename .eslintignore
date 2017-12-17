@@ -1,0 +1,5 @@
+node_modules
+misc
+client
+coverage
+test/react/testSetup.js

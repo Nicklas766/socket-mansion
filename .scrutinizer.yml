@@ -1,0 +1,13 @@
+filter:
+    excluded_paths: [client/public/*]
+
+build:
+    environment:
+        node: v8.9.1
+    tests:
+        override:
+            -
+                command: 'npm run coverage-scrut'
+                coverage:
+                    file: 'coverage/clover.xml'
+                    format: 'clover'

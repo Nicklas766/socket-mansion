@@ -1,5 +1,5 @@
 const io   = require('socket.io');
-const chatModule = require('./chat.js');
+
 /**
 *
 * Main container for the socket
@@ -13,7 +13,6 @@ const chatModule = require('./chat.js');
 
 const getModule  = (name) => this.modules.filter(module => name == module.name)[0].module;
 const getRoom    = (id)  => this.rooms.filter(room => id == room.id)[0];
-const getUser    = (id) => this.users.filter(user => id == user.id)[0];
 const removeUser = (arr, id) => arr.filter(user => user.id != id);
 
 /**
@@ -21,10 +20,9 @@ const removeUser = (arr, id) => arr.filter(user => user.id != id);
 */
 const setupUser = (socket) => {
     socket.on('setup user', (user) => {
-        console.log(user)
+        console.log(user);
         this.users.push({
             id: socket.id,
-            socket: socket,
             user: user
         });
     });
@@ -44,25 +42,32 @@ const setupRoom = (socket) => {
     * @param moduleName string
     */
     socket.on('create room', (id, moduleName) => {
-      const module = getModule(moduleName);
-      console.log(`room ${id} created`);
-      this.rooms.push({
+        const module = getModule(moduleName);
+
+        var room = {
             module: new module(this.io, id),
             id: id,
             users: []
-          });
+        };
+
+        console.log(`room ${id} created`);
+        this.rooms.push(room);
     });
     // Joins the room
     socket.on('join room', (id) => {
         const user = this.users.filter(user => socket.id == user.id)[0];
+
         console.log(user);
         let room = getRoom(id);
         // Add new user into this.rooms[].users
-        this.rooms = this.rooms.map(room => id == room.id ? Object.assign(room, {users: room.users.concat(user)}) : room);
+
+        this.rooms = this.rooms.map(room =>
+            id == room.id ? Object.assign(room, {users: room.users.concat(user)}) : room
+        );
 
         // setup room events for socket
         socket.join(id);
-        room.module.setup(user);
+        room.module.setup(socket, user);
         console.log('Someone joined room: ', id);
     });
 
@@ -70,24 +75,29 @@ const setupRoom = (socket) => {
     socket.on('leave room', (id) => {
         let roomObj = getRoom(id);
 
-        // Remove user from this.rooms[].users
-        roomObj.users = room.users.filter(user => user.id != socket.id);
-        this.rooms    = this.rooms.map(room => id == room.id ? roomObj : room);
+        console.log(this.users);
 
         // Remove events for socket and leave room
-        room.module.off(socket);
+        roomObj.module.off(socket);
         socket.leave(id);
+
+        // Remove user from this.rooms[].users
+        roomObj.users = roomObj.users.filter(user => user.id != socket.id);
+        this.rooms = this.rooms.map(room => id == room.id ? roomObj : room);
     });
 };
 
 const setupGet = (socket) => {
-  socket.on('get users', () => {
-      this.io.emit('get users', this.users);
-  });
-  socket.on('get rooms', () => {
-      this.io.emit('get rooms', this.rooms);
-  });
-}
+    socket.on('get users', () => {
+        this.io.emit('get users', this.users);
+    });
+    socket.on('get rooms', () => {
+        // Remove modules before sending to client
+        const rooms = this.rooms.map((room) => ({id: room.id, users: room.users}));
+
+        this.io.emit('get rooms', rooms);
+    });
+};
 /**
 * Disconnects the socket and removes the user from this.users based on socket.id
 */
@@ -97,8 +107,8 @@ const disconnect = (socket) => {
 
         // Remove user from all rooms and events for socket
         for (let room of this.rooms) {
-          room.users = removeUser(room.users, socket.id);
-          room.module.off(socket);
+            room.users = removeUser(room.users, socket.id);
+            room.module.off(socket);
         }
         this.users = removeUser(this.users, socket.id);
 
@@ -121,7 +131,6 @@ const socketContainer = (server, modules) => {
 
     /**
     * @param socket socket object
-    * @param user object
     */
     this.io.on('connection', (socket) => {
         console.log("New client connected with id : " + socket.id);
@@ -131,7 +140,7 @@ const socketContainer = (server, modules) => {
         setupGet(socket);
 
         disconnect(socket);
-
     });
 };
+
 module.exports = { socketContainer };

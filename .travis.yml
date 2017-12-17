@@ -1,0 +1,14 @@
+language: node_js
+
+node_js:
+    - "node"
+    - "8"
+    - "7"
+
+sudo: false
+
+git:
+    submodules: false
+
+script:
+    - npm test

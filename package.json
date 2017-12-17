@@ -6,11 +6,11 @@
   "scripts": {
     "start": "node ./bin/www",
     "test": "concurrently \"npm run mocha\" \"npm run stylelint\" \"npm run eslint\"",
-    "mocha": "nyc --reporter=html --reporter=text mocha --reporter spec test/react/testSetup.js \"test/**/*.spec.js\"",
+    "mocha": "nyc --reporter=html --reporter=text mocha",
     "stylelint": "node_modules/.bin/stylelint **/*.css",
     "eslint": "node_modules/.bin/eslint --ignore-path .eslintignore .",
+    "eslint-fix": "node_modules/.bin/eslint --ignore-path .eslintignore --fix .",
     "coverage-scrut": "nyc --reporter=clover mocha --reporter spec test/react/testSetup.js \"test/**/*.spec.js\"",
-    "docker1": "docker-compose run node-latest",
     "docker-build-start": "docker-compose up -d --no-deps --build"
   },
   "author": "Nicklas Envall",
@@ -21,6 +21,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
+    "mock-socket": "^7.1.0",
     "morgan": "~1.9.0",
     "serve-favicon": "~2.4.5",
     "socket.io": "^2.0.4"
