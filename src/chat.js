@@ -17,12 +17,6 @@ function chat(io, id) {
     this.users    = [];
 };
 
-/**
-* Connect user to the chat, save socket so we can use it
-* @param user object
-* @param socket object
-*/
-
 const createMessage = ({ text='', name='server', date=Date.now() }) => ({
       text,
       name,
@@ -47,6 +41,13 @@ chat.prototype.greet = function (name) {
 
   this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
 }
+
+/**
+* Connect user to the chat, save socket so we can use it
+* @param user object
+* @param socket object
+*/
+
 
 chat.prototype.setup = function (userObj) {
   const socket = userObj.socket;
