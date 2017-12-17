@@ -57,7 +57,6 @@ const setupRoom = (socket) => {
     socket.on('join room', (id) => {
         const user = this.users.filter(user => socket.id == user.id)[0];
 
-        console.log(user);
         let room = getRoom(id);
         // Add new user into this.rooms[].users
 
@@ -74,8 +73,6 @@ const setupRoom = (socket) => {
     // Leaves room
     socket.on('leave room', (id) => {
         let roomObj = getRoom(id);
-
-        console.log(this.users);
 
         // Remove events for socket and leave room
         roomObj.module.off(socket);

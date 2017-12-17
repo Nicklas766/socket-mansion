@@ -1,6 +1,11 @@
 # Socket-Mansion
 [![Build Status](https://travis-ci.org/Nicklas766/socket-mansion.svg?branch=master)](https://travis-ci.org/Nicklas766/socket-mansion)
 
+[![Code Coverage](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/?branch=master)
+
+[![Build Status](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/build-status/master)
+
+[![Maintainability](https://api.codeclimate.com/v1/badges/691a969af6b675e62128/maintainability)](https://codeclimate.com/github/Nicklas766/socket-mansion/maintainability)
 
 Socket-Mansion help you easily connect your users to rooms, so you can focus on
 coding for the actual room function.
