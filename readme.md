@@ -1,4 +1,6 @@
 # Socket-Mansion
+[![Build Status](https://travis-ci.org/Nicklas766/socket-mansion.svg?branch=master)](https://travis-ci.org/Nicklas766/socket-mansion)
+
 
 Socket-Mansion help you easily connect your users to rooms, so you can focus on
 coding for the actual room function.

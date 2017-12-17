@@ -18,7 +18,9 @@ var server = http.createServer(app);
 var io                   = require('socket.io-client');
 const chat               = require('../src/chat').chat;
 const {socketContainer}  = require('../src/socket-container');
-const modules            = [{module: chat, name: "chat"}]; // Will be used as parameter for socketContainer
+
+// Will be used as parameter for socketContainer
+const modules = [{module: chat, name: "chat"}];
 
 
 var socketURL = 'http://localhost:3000';
