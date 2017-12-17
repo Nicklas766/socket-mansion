@@ -13,7 +13,9 @@ connections.
 You should see your socket-mansion as a container for all rooms, while the modules
 you inject are rooms, you decide the states of the rooms.
 
-
+```
+npm install socket-mansion --save
+```
 ## How to use (in 4 steps)
 
 ### Step 1. Create room

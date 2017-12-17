@@ -2,7 +2,6 @@
   "name": "socket-mansion",
   "version": "1.0.0",
   "description": "Helps you keep track of your sockets and users in multiple rooms",
-  "private": true,
   "scripts": {
     "start": "node ./bin/www",
     "test": "concurrently \"npm run mocha\" \"npm run stylelint\" \"npm run eslint\"",
