@@ -19,7 +19,7 @@ class Chat extends React.Component {
         const {socket, id, messages} = this.state;
 
         // Events
-        socket.on(`update`, (messages) => {
+        socket.on(`message ${id}`, (messages) => {
             console.log(messages);
             this.setState({messages: messages});
         });

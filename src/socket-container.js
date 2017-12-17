@@ -29,13 +29,7 @@ const setupUser = (socket) => {
 };
 
 
-/**
-* Room events
-*
-* A room symbolizes a place where sockets are in or not.
-*
-*/
-const setupRoom = (socket) => {
+const createRoom = (socket) => {
     /**
     * Creates a room with a module
     * @param id string
@@ -43,6 +37,12 @@ const setupRoom = (socket) => {
     */
     socket.on('create room', (id, moduleName) => {
         const module = getModule(moduleName);
+
+        // Check if room exists
+        if (getRoom(id) !== undefined) {
+            console.log(`Error: ${id} already exist`);
+            return false;
+        }
 
         var room = {
             module: new module(this.io, id),
@@ -53,11 +53,24 @@ const setupRoom = (socket) => {
         console.log(`room ${id} created`);
         this.rooms.push(room);
     });
+};
+
+const joinRoom = (socket) => {
     // Joins the room
     socket.on('join room', (id) => {
         const user = this.users.filter(user => socket.id == user.id)[0];
 
         let room = getRoom(id);
+        // If room undefined or user not in room then return false
+
+        if (room == undefined) {
+            console.log(`Error: ${id} doesn't exist`);
+            return false;
+        }
+        if (room.users.includes(user)) {
+            console.log(`Error: socket already in room`);
+            return false;
+        }
         // Add new user into this.rooms[].users
 
         this.rooms = this.rooms.map(room =>
@@ -69,7 +82,9 @@ const setupRoom = (socket) => {
         room.module.setup(socket, user);
         console.log('Someone joined room: ', id);
     });
+};
 
+const leaveRoom = (socket) => {
     // Leaves room
     socket.on('leave room', (id) => {
         let roomObj = getRoom(id);
@@ -133,7 +148,9 @@ const socketContainer = (server, modules) => {
         console.log("New client connected with id : " + socket.id);
 
         setupUser(socket);
-        setupRoom(socket);
+        createRoom(socket);
+        joinRoom(socket);
+        leaveRoom(socket);
         setupGet(socket);
 
         disconnect(socket);

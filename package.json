@@ -1,15 +1,15 @@
 {
   "name": "socket-mansion",
   "version": "1.0.0",
-  "description": "Helps you keep track of your users with multiple rooms",
+  "description": "Helps you keep track of your sockets and users in multiple rooms",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
     "test": "concurrently \"npm run mocha\" \"npm run stylelint\" \"npm run eslint\"",
     "mocha": "nyc --reporter=html --reporter=text mocha",
-    "stylelint": "node_modules/.bin/stylelint **/*.css",
-    "eslint": "node_modules/.bin/eslint --ignore-path .eslintignore .",
-    "eslint-fix": "node_modules/.bin/eslint --ignore-path .eslintignore --fix .",
+    "stylelint": "stylelint **/*.css",
+    "eslint": "eslint --ignore-path .eslintignore .",
+    "eslint-fix": "eslint --ignore-path .eslintignore --fix .",
     "coverage-scrut": "nyc --reporter=clover mocha --reporter spec test/react/testSetup.js \"test/**/*.spec.js\"",
     "docker-build-start": "docker-compose up -d --no-deps --build"
   },
@@ -21,7 +21,6 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.15.5",
-    "mock-socket": "^7.1.0",
     "morgan": "~1.9.0",
     "serve-favicon": "~2.4.5",
     "socket.io": "^2.0.4"
@@ -45,5 +44,22 @@
     "stylelint": "^8.3.1",
     "supertest": "^3.0.0",
     "uglify-js": "^3.1.6"
-  }
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nicklas766/socket-mansion.git"
+  },
+  "keywords": [
+    "websocket",
+    "socket",
+    "room"
+  ],
+  "bugs": {
+    "url": "https://github.com/Nicklas766/socket-mansion/issues"
+  },
+  "homepage": "https://github.com/Nicklas766/socket-mansion#readme"
 }

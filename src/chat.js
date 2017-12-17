@@ -26,7 +26,7 @@ chat.prototype.message = function (socket) {
 
         this.messages = this.messages.concat(msg); // Save
 
-        this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
+        this.io.sockets.in(this.id).emit(`message ${this.id}`, this.messages); // Emit
     });
 };
 
@@ -36,7 +36,7 @@ chat.prototype.greet = function (name) {
 
     this.messages = this.messages.concat(msg); // Save
 
-    this.io.sockets.in(this.id).emit(`update`, this.messages); // Emit
+    this.io.sockets.in(this.id).emit(`message ${this.id}`, this.messages); // Emit
 };
 
 /**

@@ -17,7 +17,7 @@ var server = http.createServer(app);
 // socket.io and socket-container module
 var io                   = require('socket.io-client');
 const chat               = require('../src/chat').chat;
-const {socketContainer}  = require('../src/socket-container');
+const socketContainer  = require('../index.js');
 
 // Will be used as parameter for socketContainer
 const modules = [{module: chat, name: "chat"}];

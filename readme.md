@@ -16,45 +16,45 @@ you inject are rooms, you decide the states of the rooms.
 
 ## How to use (in 4 steps)
 
-### Step 1. Setup/Create room
+### Step 1. Create room
 
 **Constructor:**
 Your room modules need to have, io and id as parameters.
 ```javascript
 function room(io, id) {
-    this.io = io;
-    this.id = id;
-};
+    this.io = io
+    this.id = id
+}
 ```
 
 **User joins:**
-When a user joins the room, `room.setup(userObj)` will be called. An example
+When a user joins the room, `room.setup(socket, userObj)` will be called. An example
 how your setup function can look like.
 ```javascript
-room.prototype.setup = function (userObj) {
-    const socket = userObj.socket;
-    const user = {name: userObj.user.name, id: socket.id};
+room.prototype.setup = function (socket, userObj) {
+    const user = {name: userObj.user.name, id: socket.id}
+    socket.emit("hello mansion", "Hey all! I joined a room.");
 }
 ```
 
 **User leaves:**
 When a user leaves the room, `room.off(socket)` will be called. This is a good
-time to maybe update your room module, or remove events for the socket. Example:
+time to maybe update your rooms state, or remove events for the socket. Example:
 ```javascript
 room.prototype.off = function (socket) {
-    socket.off(`my event`);
+    socket.off(`my event`)
 }
 ```
 
-### Step 2. Add your room module to mansion and start with server
+### Step 2. Add your room module to the mansion before server.listen()
 
 
 ```javascript
-var http               = require('http');
-var app                = require('../app');
-const {socketMansion}  = require('socket-mansion');
-const chat             = require('../src/chat').chat;
-const game             = require('../src/game').game;
+var http               = require('http')
+var app                = require('../app')
+const {socketMansion}  = require('socket-mansion')
+const chat             = require('../src/chat').chat
+const game             = require('../src/game').game
 
 const modules = [
     {
@@ -66,8 +66,8 @@ const modules = [
         name: "game"
     },
 ]
-var server = http.createServer(app);
-socketMansion(server, modules);
+var server = http.createServer(app)
+socketMansion(server, modules)
 ```
 
 
@@ -79,30 +79,30 @@ using any emits.
 
 **Setup user:**
 ```javascript
-socket.emit(`setup user`, userObj)            // Client emits
-{id: socket.id, socket: socket, user: userObj} // Server saves
+socket.emit(`setup user`, userObj)  // Client emits
+{id: socket.id, user: userObj}      // Server saves
 ```
 
 **Events:**
 Here are the events, as you can see on the `create room` we have a third argument
-which is the modules name you wish to use.
+which is the modules name you want to use.
 
 ```javascript
 
     socket.on('get users', (users) => {
         //receive users from mansion
-    });
+    })
 
     socket.on('get rooms', (rooms) => {
         //receive rooms, which contains the users and the id of room
-    });
+    })
 
-    socket.emit('get users'); // Triggers above
-    socket.emit('get rooms'); // Triggers above
+    socket.emit('get users') // Triggers above
+    socket.emit('get rooms') // Triggers above
 
-    socket.emit('create room', 'name', 'chat');
-    socket.emit('join room', 'name');
-    socket.emit('leave room', 'name');
+    socket.emit('create room', 'name', 'chat')
+    socket.emit('join room', 'name')
+    socket.emit('leave room', 'name')
 
 
 ```
@@ -116,14 +116,14 @@ constructor. Then we can do something like this
 chat.prototype.message = function (socket) {
     socket.on(`message ${this.id}`, (text) => {
         // All clients in room gets this message
-        this.io.sockets.in(this.id).emit(`new ${this.id}`, text);
-    });
-};
+        this.io.sockets.in(this.id).emit(`new ${this.id}`, text)
+    })
+}
 // client
-socket.on(`new ${this.id}`, (text) => {
-    console.log(text);
-});
-socket.emit(`new ${this.id}`, "hello!");
+socket.on(`new ${roomId}`, (text) => {
+    console.log(text)
+})
+socket.emit(`new ${roomId}`, "hello!")
 // hello!
 ```
 
