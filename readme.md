@@ -1,64 +1,55 @@
 # Socket-Mansion
 [![Build Status](https://travis-ci.org/Nicklas766/socket-mansion.svg?branch=master)](https://travis-ci.org/Nicklas766/socket-mansion)
-
 [![Code Coverage](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/?branch=master)
-
 [![Build Status](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Nicklas766/socket-mansion/build-status/master)
-
 [![Maintainability](https://api.codeclimate.com/v1/badges/691a969af6b675e62128/maintainability)](https://codeclimate.com/github/Nicklas766/socket-mansion/maintainability)
 
-Socket-Mansion help you easily connect your users to rooms, so you can focus on
-coding for the actual room function.
+Socket-Mansion helps you connect your sockets to rooms, while also keeping check
+on where your users are.
+
+This lets you focus on the actual function of the room instead of worrying about
+connections.
 
 You should see your socket-mansion as a container for all rooms, while the modules
 you inject are rooms, you decide the states of the rooms.
 
 
-## Needed to work
-Your room-modules needs to return a `setup(socket)`, so we can add the events of
-the module to the socket. You'll also need to return a `off(socket)`, so we can
-unsubscribe all events when you leave the room.
+## How to use (in 4 steps)
 
+### Step 1. Setup/Create room
 
-## Good to know before we get started
-
-### Server
-
-**Room**
+**Constructor:**
+Your room modules need to have, io and id as parameters.
 ```javascript
-// Your room modules need to have, io and id as parameters.
 function room(io, id) {
     this.io = io;
     this.id = id;
 };
 ```
 
-**Setup user in mansion**
+**User joins:**
+When a user joins the room, `room.setup(userObj)` will be called. An example
+how your setup function can look like.
 ```javascript
-// You need to setup user before emitting anything else
-socket.emit(`setup user`, userObj)            // Client emits
-{id: socket.id, socket: socket, user: userObj} // Server saves
-```
-
-**When user joins room**
-```javascript
-// Your module needs to have a "setup(userObj)", which is called on join
 room.prototype.setup = function (userObj) {
     const socket = userObj.socket;
     const user = {name: userObj.user.name, id: socket.id};
 }
 ```
 
-**When user leaves room**
+**User leaves:**
+When a user leaves the room, `room.off(socket)` will be called. This is a good
+time to maybe update your room module, or remove events for the socket. Example:
 ```javascript
-// Your module needs to have an "off(socket)", which is called on leave
 room.prototype.off = function (socket) {
-    socket.off(`my event`); // Remove events for socket
+    socket.off(`my event`);
 }
 ```
 
+### Step 2. Add your room module to mansion and start with server
+
+
 ```javascript
-// How to setup the rooms
 var http               = require('http');
 var app                = require('../app');
 const {socketMansion}  = require('socket-mansion');
@@ -67,52 +58,76 @@ const game             = require('../src/game').game;
 
 const modules = [
     {
-        module:chat,
-        name:"chat"
+        module: chat,
+        name: "chat"
     },
     {
-        module:game,
-        name:"game"
+        module: game,
+        name: "game"
     },
 ]
 var server = http.createServer(app);
 socketMansion(server, modules);
 ```
 
-### Client (with react)
 
-socket-mansion has setup some events for you already, you can see some examples
-with react below,
+### Step 3. Client side
+
+The mansion has some events already created for you, so you can easily connect
+to your room-events. Before I show you, make sure you setup your user before
+using any emits.
+
+**Setup user:**
 ```javascript
-componentDidMount() {
-    const {socket, user} = this.state;
+socket.emit(`setup user`, userObj)            // Client emits
+{id: socket.id, socket: socket, user: userObj} // Server saves
+```
+
+**Events:**
+Here are the events, as you can see on the `create room` we have a third argument
+which is the modules name you wish to use.
+
+```javascript
 
     socket.on('get users', (users) => {
-        this.setState({users: users});
+        //receive users from mansion
     });
 
     socket.on('get rooms', (rooms) => {
-         this.setState({rooms: rooms});
+        //receive rooms, which contains the users and the id of room
     });
 
-    socket.emit('setup user', user);
-}
-// NOTE: we declare the event, id then which module the room should use
-createRoom() {
-     this.state.socket.emit('create room', this.state.room, 'chat');
-}
+    socket.emit('get users'); // Triggers above
+    socket.emit('get rooms'); // Triggers above
 
-joinRoom() {
-    this.state.socket.emit('join room', this.state.room);
-    this.setState({inRoom: true});
-}
-leaveRoom() {
-    this.state.socket.emit('leave room', this.state.room);
-    this.setState({inRoom: false});
-}
+    socket.emit('create room', 'name', 'chat');
+    socket.emit('join room', 'name');
+    socket.emit('leave room', 'name');
+
 
 ```
-## Examples
+
+### Step 4. Wait.. won't my room events be the same if I create a new room with the same module?
+Yes you are correct, to fix this we can use the `id` that we get in our room
+constructor. Then we can do something like this
+
+```javascript
+// "room chat" function on server-side
+chat.prototype.message = function (socket) {
+    socket.on(`message ${this.id}`, (text) => {
+        // All clients in room gets this message
+        this.io.sockets.in(this.id).emit(`new ${this.id}`, text);
+    });
+};
+// client
+socket.on(`new ${this.id}`, (text) => {
+    console.log(text);
+});
+socket.emit(`new ${this.id}`, "hello!");
+// hello!
+```
+
+## Example with React
 
 Instead of me posting lots of code, then please checkout
 
