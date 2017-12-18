@@ -26,7 +26,9 @@ chat.prototype.message = function (socket) {
 
         this.messages = this.messages.concat(msg); // Save
 
-        this.io.sockets.in(this.id).emit(`message ${this.id}`, this.messages); // Emit
+        console.log("me starteed", this.messages);
+
+        this.io.sockets.in(this.id).emit(`message ${this.id}`, msg); // Emit
     });
 };
 
