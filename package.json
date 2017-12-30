@@ -1,6 +1,6 @@
 {
   "name": "socket-mansion",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Helps you keep track of your sockets and users in multiple rooms",
   "scripts": {
     "start": "node ./bin/www",
@@ -22,7 +22,8 @@
     "express": "~4.15.5",
     "morgan": "~1.9.0",
     "serve-favicon": "~2.4.5",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "socket.io-client": "^2.0.4"
   },
   "devDependencies": {
     "babel-eslint": "^8.0.3",

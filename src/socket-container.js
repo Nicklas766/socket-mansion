@@ -20,7 +20,7 @@ const removeUser = (arr, id) => arr.filter(user => user.id != id);
 */
 const setupUser = (socket) => {
     socket.on('setup user', (user) => {
-        console.log(user);
+        // console.log(user);
         this.users.push({
             id: socket.id,
             user: user
@@ -50,7 +50,7 @@ const createRoom = (socket) => {
             users: []
         };
 
-        console.log(`room ${id} created`);
+        // console.log(`room ${id} created`);
         this.rooms.push(room);
     });
 };
@@ -80,7 +80,7 @@ const joinRoom = (socket) => {
         // setup room events for socket
         socket.join(id);
         room.module.setup(socket, user);
-        console.log('Someone joined room: ', id);
+        // console.log('Someone joined room: ', id);
     });
 };
 
@@ -115,7 +115,7 @@ const setupGet = (socket) => {
 */
 const disconnect = (socket) => {
     socket.on('disconnect', () => {
-        console.log(socket.id + ' disconnected');
+        // console.log(socket.id + ' disconnected');
 
         // Remove user from all rooms and events for socket
         for (let room of this.rooms) {
@@ -145,7 +145,7 @@ const socketContainer = (server, modules) => {
     * @param socket socket object
     */
     this.io.on('connection', (socket) => {
-        console.log("New client connected with id : " + socket.id);
+        // console.log("New client connected with id : " + socket.id);
 
         setupUser(socket);
         createRoom(socket);

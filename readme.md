@@ -138,3 +138,94 @@ Instead of me posting lots of code, then please checkout
 [Choose room (client)](https://github.com/Nicklas766/socket-mansion/blob/master/client/app/compontents/page/Home.js)
 
 [Chat room (client)](https://github.com/Nicklas766/socket-mansion/blob/master/client/app/compontents/page/Chat.js)
+
+## Test your room modules easily with mocha
+
+A test with mocha and sockets can look like this,
+
+```
+it('Should create room1 with chat module and have player1 and player2', (done) => {
+    var client1 = io(socketURL, options);
+    client1.on('connect', () => {
+
+        var client2  = io(socketURL, options);
+        client2.on('connect', () => {
+
+            client1.emit('setup user', {name: "player1"});
+            client2.emit('setup user', {name: "player2"});
+
+            client1.emit(`create room`, `room1`, module);
+
+            client1.emit('join room', `room1`);
+            client2.emit('join room', `room1`);
+
+            client2.on('message room1', (messages) => {
+                assert.equal(messages[0].text, 'Room room1 has been created');
+                assert.equal(messages[1].text, 'player1 has joined the server, welcome!');
+                assert.equal(messages[2].text, 'player2 has joined the server, welcome!');
+
+                client1.disconnect();
+                client2.disconnect();
+                done();
+            });
+        });
+    });
+});
+```
+
+Wouldn't it be great if you could remove the following,
+
+```
+// var client1 = io(socketURL, options);
+// client1.on('connect', () => {
+//
+//    var client2  = io(socketURL, options);
+//    client2.on('connect', () => {
+//
+//        client1.emit('setup user', {name: "player1"});
+//        client2.emit('setup user', {name: "player2"});
+//
+//        client1.emit(`create room`, `room1`, module);
+//
+//        client1.emit('join room', `room1`);
+//        client2.emit('join room', `room1`);
+
+        client2.on('message room1', (messages) => {
+            assert.equal(messages[0].text, 'Room room1 has been created');
+            assert.equal(messages[1].text, 'player1 has joined the server, welcome!');
+            assert.equal(messages[2].text, 'player2 has joined the server, welcome!');
+
+            client1.disconnect();
+            client2.disconnect();
+            done();
+        });
+//    });
+// });
+```
+
+You can use the `setupRoomTest()` to achieve something like this,
+
+```
+it('Should create room1 with chat module and have player1 and player2', (done) => {
+    const testFunc = (client1, client2) => (done) => {
+        client2.on('message room1', (messages) => {
+            assert.equal(messages[0].text, 'Room room1 has been created');
+            assert.equal(messages[1].text, 'player1 has joined the server, welcome!');
+            assert.equal(messages[2].text, 'player2 has joined the server, welcome!');
+
+            client1.disconnect();
+            client2.disconnect();
+            done();
+        });
+    };
+
+    setupRoomTest({
+        socketURL: socketURL,
+        options: options,
+        func: testFunc,
+        done: done,
+        room: 'room1',
+        module: 'chat'
+    });
+});
+```
