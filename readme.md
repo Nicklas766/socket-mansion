@@ -143,7 +143,7 @@ Instead of me posting lots of code, then please checkout
 
 A test with mocha and sockets can look like this,
 
-```
+```js
 it('Should create room1 with chat module and have player1 and player2', (done) => {
     var client1 = io(socketURL, options);
     client1.on('connect', () => {
@@ -175,7 +175,7 @@ it('Should create room1 with chat module and have player1 and player2', (done) =
 
 Wouldn't it be great if you could remove the following,
 
-```
+```js
 // var client1 = io(socketURL, options);
 // client1.on('connect', () => {
 //
@@ -205,7 +205,7 @@ Wouldn't it be great if you could remove the following,
 
 You can use the `setupRoomTest()` to achieve something like this,
 
-```
+```js
 it('Should create room1 with chat module and have player1 and player2', (done) => {
     const testFunc = (client1, client2) => (done) => {
         client2.on('message room1', (messages) => {
