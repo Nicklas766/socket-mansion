@@ -99,6 +99,13 @@ const leaveRoom = (socket) => {
     });
 };
 
+const removeRoom = (socket) => {
+    // Leaves room
+    socket.on('remove room', (id) => {
+        this.rooms = this.rooms.filter(room => room.id !== id);
+    });
+};
+
 const setupGet = (socket) => {
     socket.on('get users', () => {
         this.io.emit('get users', this.users);
@@ -151,6 +158,7 @@ const socketContainer = (server, modules) => {
         createRoom(socket);
         joinRoom(socket);
         leaveRoom(socket);
+        removeRoom(socket);
         setupGet(socket);
 
         disconnect(socket);

@@ -105,6 +105,7 @@ which is the modules name you want to use.
     socket.emit('create room', 'name', 'chat')
     socket.emit('join room', 'name')
     socket.emit('leave room', 'name')
+    socket.emit('remove room', 'name') // does not trigger .off, you should leave aswell
 
 
 ```

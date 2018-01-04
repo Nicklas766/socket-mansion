@@ -1,6 +1,6 @@
 {
   "name": "socket-mansion",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Helps you keep track of your sockets and users in multiple rooms",
   "scripts": {
     "start": "node ./bin/www",
